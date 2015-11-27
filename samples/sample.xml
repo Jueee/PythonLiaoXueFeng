@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:yweather="http://xml.weather.yahoo.com/ns/rss/1.0" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" version="2.0">  
+  <channel> 
+    <title>Yahoo! Weather - Beijing, CN</title>  
+    <link>http://us.rd.yahoo.com/dailynews/rss/weather/Beijing__CN/*http://weather.yahoo.com/forecast/CHXX0008_c.html</link>  
+    <description>Yahoo! Weather for Beijing, CN</description>  
+    <language>en-us</language>  
+    <lastBuildDate>Tue, 17 Nov 2015 7:59 pm CST</lastBuildDate>  
+    <ttl>60</ttl>  
+    <yweather:location city="Beijing" region="" country="China"/>  
+    <yweather:units temperature="C" distance="km" pressure="mb" speed="km/h"/>  
+    <yweather:wind chill="4" direction="160" speed="6.44"/>  
+    <yweather:atmosphere humidity="68" visibility="9" pressure="1029.6" rising="0"/>  
+    <yweather:astronomy sunrise="7:01 am" sunset="4:56 pm"/>  
+    <image> 
+      <title>Yahoo! Weather</title>  
+      <width>142</width>  
+      <height>18</height>  
+      <link>http://weather.yahoo.com</link>  
+      <url>http://l.yimg.com/a/i/brand/purplelogo//uh/us/news-wea.gif</url> 
+    </image>  
+    <item> 
+      <title>Conditions for Beijing, CN at 7:59 pm CST</title>  
+      <geo:lat>39.91</geo:lat>  
+      <geo:long>116.39</geo:long>  
+      <link>http://us.rd.yahoo.com/dailynews/rss/weather/Beijing__CN/*http://weather.yahoo.com/forecast/CHXX0008_c.html</link>  
+      <pubDate>Tue, 17 Nov 2015 7:59 pm CST</pubDate>  
+      <yweather:condition text="Cloudy" code="26" temp="6" date="Tue, 17 Nov 2015 7:59 pm CST"/>  
+      <description> <![CDATA[
+<img src="http://l.yimg.com/a/i/us/we/52/26.gif"/><br /> <b>Current Conditions:</b><br /> Cloudy, 6 C<BR /> <BR /><b>Forecast:</b><BR /> Tue - Cloudy. High: 10 Low: 1<br /> Wed - Mostly Cloudy. High: 6 Low: 2<br /> Thu - Rain/Snow. High: 4 Low: -1<br /> Fri - AM Snow Showers. High: 3 Low: -1<br /> Sat - Light Snow. High: 1 Low: -2<br /> <br /> <a href="http://us.rd.yahoo.com/dailynews/rss/weather/Beijing__CN/*http://weather.yahoo.com/forecast/CHXX0008_c.html">Full Forecast at Yahoo! Weather</a><BR/><BR/> (provided by <a href="http://www.weather.com" >The Weather Channel</a>)<br/>
+]]> </description>  
+      <yweather:forecast day="Tue" date="17 Nov 2015" low="1" high="10" text="Cloudy" code="26"/>  
+      <yweather:forecast day="Wed" date="18 Nov 2015" low="2" high="6" text="Mostly Cloudy" code="28"/>  
+      <yweather:forecast day="Thu" date="19 Nov 2015" low="-1" high="4" text="Rain/Snow" code="5"/>  
+      <yweather:forecast day="Fri" date="20 Nov 2015" low="-1" high="3" text="AM Snow Showers" code="14"/>  
+      <yweather:forecast day="Sat" date="21 Nov 2015" low="-2" high="1" text="Light Snow" code="14"/>  
+      <guid isPermaLink="false">CHXX0008_2015_11_21_7_00_CST</guid> 
+    </item> 
+  </channel> 
+</rss>
+
