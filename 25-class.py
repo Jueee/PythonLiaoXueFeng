@@ -8,6 +8,7 @@ class Student(object):
 	def print_score(self):
 		print('%s : %s ' % (self.name, self.score))
 
+
 bart = Student('bart', 59)
 lisa = Student('lisa', 78)
 bart.print_score()
