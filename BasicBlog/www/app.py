@@ -22,3 +22,13 @@ def init(loop):
 loop = asyncio.get_event_loop()
 loop.run_until_complete(init(loop))
 loop.run_forever()
+
+
+'''
+运行python app.py，Web App将在9000端口监听HTTP请求，并且对首页/进行响应：
+$ python3 app.py
+INFO:root:server started at http://127.0.0.1:9000...
+这里我们简单地返回一个Awesome字符串，在浏览器中可以看到效果.
+
+这说明我们的Web App骨架已经搭好了，可以进一步往里面添加更多的东西。
+'''
