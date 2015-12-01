@@ -37,7 +37,7 @@ def create_pool(loop, ** kw):
     __pool = yield from aiomysql.create_pool(
         host=kw.get('host','localhost'),
         port=kw.get('port',3306),
-        user=kw['root'],
+        user=kw['user'],
         password=kw['password'],
         db=kw['db'],
         charset=kw.get('charset','utf8'),
@@ -83,11 +83,13 @@ Insert, Update, Delete
 execute()函数和select()函数所不同的是，cursor对象不返回结果集，而是通过rowcount返回结果数。
 '''
 @asyncio.coroutine
-def execute(sql, args):
+def execute(sql, args, autocommit=True):
     log(sql)
     with(yield from __pool) as conn:
+        if not autocommit:
+            yield from conn.begin()
         try:
-            cur = yield from coon.cursor
+            cur = yield from conn.cursor()
             yield from cur.execute(sql.replace('?','%s'), args)
             affected = cur.rowcount
             yield from cur.close()
@@ -180,12 +182,52 @@ class Model(dict, metaclass=ModelMetaclass):
         if value is None:
             field = self.__mappings__[key]
             if field.default is not None:
-                value = field.default() if callablle(field.default) else field.default
+                value = field.default() if callable(field.default) else field.default
                 logging.debug("using default value for %s:%s" % (key, str(value)))
                 setattr(self, key, value)
         return value
 
     # 我们往Model类添加class方法，就可以让所有子类调用class方法：
+    @classmethod
+    @asyncio.coroutine
+    def findAll(cls, where=None, args=None, **kw):
+        'find objects by where clause.'
+        if where:
+            sql.append('where')
+            sql.append(where)
+        if args is None:
+            args = []
+        orderBy = kw.get('orderBy', None)
+        if orderBy:
+            sql.append('order by')
+            sql.append(orderBy)
+        limit = kw.get('limit', None)
+        if limit is not None:
+            sql.append('limit')
+            if isinstance(limit,int):
+                sql.append('?')
+                args.append(limit)
+            elif isinstance(limit, tuple) and len(limit) == 2:
+                sql.append('?,?')
+                args.extend(limit)
+            else:
+                raise ValueError('Invalid limit value:%s' % str(limit)) 
+        rs = yield from select(' '.join(sql), args)
+        return [cls(**r) for r in rs]
+
+    @classmethod
+    @asyncio.coroutine
+    def findNumber(cls, selectField, where=None,args=None):
+        ' find number by select and where.'
+        sql = ['select %s _num_ from `%s`' % (selectField,cls.__table__)]
+        if where:
+            sql.append('where')
+            sql.append(where)
+        rs = yield from select(' '.join(sql), args, 1)
+        if len(rs) == 0:
+            return None
+        return rs[0]['_num_']
+
     @classmethod
     @asyncio.coroutine
     def find(cls, pk):
@@ -234,8 +276,22 @@ class StringField(Field):
     def __init__(self, name=None, primary_key=False, default=None, ddl='varchar(100)'):
         super().__init__(name,ddl,primary_key,default)
 
+class BooleanField(Field):
+
+    def __init__(self, name=None, default=False):
+        super().__init__(name, 'boolean', False, default)
+
 class IntegerField(Field):
-    def __init__(self, name=None, primary_key=False, default=None, ddl='number'):
-        super().__init__(name,ddl,primary_key,default)
-        
-        
+
+    def __init__(self, name=None, primary_key=False, default=0):
+        super().__init__(name, 'bigint', primary_key, default)
+
+class FloatField(Field):
+
+    def __init__(self, name=None, primary_key=False, default=0.0):
+        super().__init__(name, 'real', primary_key, default)
+
+class TextField(Field):
+
+    def __init__(self, name=None, default=None):
+        super().__init__(name, 'text', False, default)

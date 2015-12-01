@@ -34,7 +34,7 @@ from email.utils import parseaddr
 
 # 输入邮件地址, 口令和POP3服务器地址:
 email = '18767162147@sina.cn'
-password = 'xinlang427299'
+password = 'balabala'
 pop3_server = 'pop.sina.cn'
 
 # 连接到POP3服务器:
