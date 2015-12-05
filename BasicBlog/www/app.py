@@ -10,14 +10,18 @@ from aiohttp import web
 
 from jinja2 import Environment, FileSystemLoader
 from coroweb import add_routes, add_static
-
+from orm import create_pool
 from apis import APIError
 
 def init_jinja2(app, **kw):
     logging.info('init jinja2...')
     options = dict(
         autoescape = kw.get('autoescape', True),
-        block_start_string = kw.get('block_start_string','{%')
+        block_start_string = kw.get('block_start_string','{%'),
+        block_end_string = kw.get('block_end_string','%}'),
+        variable_start_string = kw.get('variable_start_string','{{'),
+        variable_end_string = kw.get('variable_end_string','}}'),
+        auto_reload = kw.get('auto_reload',True)
     )
     path = kw.get('path',None)
     if path is None:
@@ -52,6 +56,7 @@ def logger_factory(app, handler):
 def response_factory(app,handler):
     @asyncio.coroutine
     def response(request):
+        logging.info('Response handler...')
         # 结果:
         r = yield from handler(request)
         if isinstance(r, web.StreamResponse):
@@ -72,6 +77,16 @@ def response_factory(app,handler):
                 resp = web.Response(body=json.dumps(r,ensure_ascii=False,default=lambda o:o.__dict__).encode('utf-8'))
                 resp.content_type = 'application/json;charset=utf-8'
                 return resp
+            else:
+                resp = web.Response(body=app['__templating__'].get_template(template).render(**r).encode('utf-8'))
+                resp.content_type = 'text/html;charset=utf-8'
+                return resp
+        if isinstance(r, int) and t>=100 and t< 600:
+            return web.Response(t)
+        if isinstance(r.tuple) and len(r)==2:
+            t,m = r
+            if isinstance(t,int) and t>=100 and t<600:
+                return web.Response(t, str(m))
         # default:
         resp = web.Response(body=str(r).encode('utf-8'))
         resp.content_type = 'text/plain;charset=utf-8'
@@ -89,6 +104,7 @@ def datetime_filter(t):
 
 @asyncio.coroutine
 def init(loop):
+    yield from create_pool(loop=loop,user='basicblog',password='password',db='awesome')
     app = web.Application(loop=loop, middlewares=[
         logger_factory, response_factory
     ])

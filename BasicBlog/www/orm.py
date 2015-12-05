@@ -65,12 +65,12 @@ def select(sql, args, size=None):
     global __pool
     print('__pool',__pool)
     with(yield from __pool) as conn:
-        cur = yield from conn.cursor(aiomysql.DictCuursor)
+        cur = yield from conn.cursor(aiomysql.DictCursor)
         yield from cur.execute(sql.replace('?','%s'), args or ())
         if size:
             rs = yield from cur.fetchmany(size)
         else:
-            rs = yield from cur.frtchall()
+            rs = yield from cur.fetchall()
         yield from cur.close()
         logging.info('rows returned:%s' % len(rs))
         return rs
@@ -192,6 +192,7 @@ class Model(dict, metaclass=ModelMetaclass):
     @asyncio.coroutine
     def findAll(cls, where=None, args=None, **kw):
         'find objects by where clause.'
+        sql = [cls.__select__]
         if where:
             sql.append('where')
             sql.append(where)
