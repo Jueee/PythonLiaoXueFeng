@@ -8,7 +8,7 @@ config_default.py 配置文件简单明了。
 
 configs = {
     'db':{
-        'host':'192.168.0.100'
+        'host':'192.168.12.23'
     }
 }
 

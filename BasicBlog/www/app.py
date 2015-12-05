@@ -12,6 +12,7 @@ from jinja2 import Environment, FileSystemLoader
 from coroweb import add_routes, add_static
 from orm import create_pool
 from apis import APIError
+from config import configs
 
 def init_jinja2(app, **kw):
     logging.info('init jinja2...')
@@ -104,7 +105,7 @@ def datetime_filter(t):
 
 @asyncio.coroutine
 def init(loop):
-    yield from create_pool(loop=loop,user='basicblog',password='password',db='awesome')
+    yield from create_pool(loop=loop, **configs.db)
     app = web.Application(loop=loop, middlewares=[
         logger_factory, response_factory
     ])

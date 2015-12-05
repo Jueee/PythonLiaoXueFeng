@@ -16,7 +16,7 @@ configs = {
         'port':3306,
         'user':'basicblog',
         'password':'password',
-        'database':'awesome'
+        'db':'awesome'
     },
     'session':{
         'secret':'AwEsOmE'
