@@ -1,0 +1,70 @@
+<<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    {% block meta %} {% endblock %}
+    <title>{% block title%} ? {% endblock %} - Awesome Python Webapp</title>
+    <link rel="stylesheet" href="/static/css/uikit.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/uikit.gradient.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/awesome.css">
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/sha1.min.js"></script>
+    <script type="text/javascript" src="/static/js/uikit.min.js"></script>
+    <script type="text/javascript" src="/static/js/awesome.js"></script>
+    {% block beforehead %}<!-- before head -->{% endblock %}
+</head>
+<body>
+    <nav class="">
+        <div class="">
+            <a href="/" class="">Awesome</a>
+            <ul class="">
+                <li data-url='blogs'><a href="/"><i class=""></i>日志</a></li>
+                <li data-url='blogs'><a href="/"><i class=""></i>教程</a></li>
+                <li data-url='blogs'><a href="/"><i class=""></i>源码</a></li>
+            </ul>
+            <div class="">
+                <ul class="">
+                {% if user %}
+                    <li class="" data-uk-dropdown>
+                        <a href="#0"><i class=""></i>{{user.name}}</a>
+                        <div class="">
+                            <ul class="">
+                                <li><a href="/signout"><i class=""></i>登出</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                {% else %}
+                    <li><a href="/signin"><i class=""></i>登陆</a></li>
+                    <li><a href="/register"><i class=""></i>注册</a></li>
+                {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="">
+        <div class="">
+            <!--content-->
+            {% block content %}
+            {% endblock %}
+            <!--// content -->
+        </div>
+    </div>
+
+    <div class="" style="">
+        <div class="">
+            <div class="">
+                <p>
+                    <a href="#" target="_blank" class=""></a>
+                    <a href="#" target="_blank" class=""></a>
+                    <a href="#" target="_blank" class=""></a>
+                    <a href="#" target="_blank" class=""></a>
+                </p>
+                <p>Powered by<a href="">Awesome Python Webapp</a>. Copyright &copy; 2014.[<a href="" target="">Manage</a>]</p>
+                <p><a href="" target="">www.jue.com</a>.All rights reserved.</p>
+                <a href="#" target="_blank"><i class="" style=""></i></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

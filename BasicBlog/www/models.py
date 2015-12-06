@@ -54,7 +54,7 @@ class Comment(Model):
 
 def test(loop):
     yield from create_pool(loop=loop,user='basicblog',password='password',db='awesome')
-    u = User(name='柳灵康',email='hellojue@foxmail.com',passwd = '12132',image='about:blank')
+    u = User(name='尉勇强',email='hellojue@foxmail.com',passwd = '12132',image='about:blank')
     yield from u.save()
 
 

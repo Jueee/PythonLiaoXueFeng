@@ -105,7 +105,7 @@ def has_var_kw_arg(fn):
         if param.kind == inspect.Parameter.VAR_KEYWORD:
             return True
 
-def has_nemed_kw_args(fn):
+def has_named_kw_args(fn):
     params = inspect.signature(fn).parameters
     for name, param in params.items():
         if param.kind == inspect.Parameter.KEYWORD_ONLY:
@@ -133,15 +133,14 @@ class RequestHandler(object):
         self._func = fn
         self._has_request_arg = has_request_arg(fn)
         self._has_var_kw_arg = has_var_kw_arg(fn)
-        self._has_nemed_kw_args = has_nemed_kw_args(fn)
+        self._has_named_kw_args = has_named_kw_args(fn)
         self._named_kw_args = get_named_kw_args(fn)
         self._required_kw_args = get_required_kw_args(fn)
 
     @asyncio.coroutine
     def __call__(self, request):
-        logging.info('request:--%s  %s' % (request,type(request)))
         kw = None
-        if self._has_var_kw_arg or self._has_nemed_kw_args or self._required_kw_args:
+        if self._has_var_kw_arg or self._has_named_kw_args or self._required_kw_args:
             if request.method == 'POST':
                 if not request.content_type:
                     return web.HTTPBadRequest('Missing Content-Type.')
@@ -191,8 +190,11 @@ class RequestHandler(object):
         except APIError as e:
             return dict(error=e.error,data=e.data,message=e.message)
         
+    
 def add_static(app):
-    pass
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+    app.router.add_static('/static/', path)
+    logging.info('add static %s => %s' % ('/static/', path))
 
 # add_route函数，用来注册URL处理函数：
 def add_route(app, fn):
