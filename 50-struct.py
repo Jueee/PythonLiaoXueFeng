@@ -16,6 +16,7 @@ print(struct.pack('>I', 10240099))
 
 
 
+
 '''
 unpack把bytes变成相应的数据类型
 
