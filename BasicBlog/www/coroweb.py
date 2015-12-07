@@ -190,7 +190,7 @@ class RequestHandler(object):
         except APIError as e:
             return dict(error=e.error,data=e.data,message=e.message)
         
-# 20151206 由于缺少该方法，导致JS、CSS引入失败404
+    
 def add_static(app):
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
     app.router.add_static('/static/', path)
