@@ -3,7 +3,7 @@ import re, time, json, logging, hashlib, base64, asyncio
 from coroweb import get, post
 from aiohttp import web
 from models import User, Comment, Blog, next_id
-from apis import APIValueError,APIError
+from apis import APIValueError,APIError,APIPermissionError
 from config import configs
 
 COOKIE_NAME = 'awesession'
@@ -12,12 +12,23 @@ _COOKIE_KEY = configs.session.secret
 _RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
 _RE_SHA1 = re.compile(r'^[0-9a-f]{40}$')
 
+
+def check_admin(request):
+    logging.info('request.__user__:%s' % (not request.__user__.admin))
+    if request.__user__ is None or not request.__user__.admin:
+        logging.info('request.__user__:%s' % request.__user__)
+        raise APIPermissionError()
+
 # 计算加密cookie:
 def user2cookie(user, max_age):
     expires = str(int(time.time() + max_age))
     s = '%s-%s-%s-%s' % (user.id, user.passwd, expires, _COOKIE_KEY)
     L = [user.id, expires, hashlib.sha1(s.encode('utf-8')).hexdigest()]
     return '-'.join(L)
+
+def text2html(text):
+    lines = map(lambda s: '<p>%s<p>' % s.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;'), filter(lambda s:s.strip()!='',text.split('\n')))
+    return ''.join(lines)
 
 # 解密 cookie
 @asyncio.coroutine
@@ -72,6 +83,27 @@ def register(request):
 def signin(request):
     return {
         '__template__':'signin.html'
+    }
+
+@get('/manage/blogs/create')
+def manage_blog_edit(request):
+    return {
+        '__template__':'manage_blog_edit.html',
+        'id':'',
+        'action':'/api/blogs'
+    }
+
+@get('/blog/{id}')
+def get_blog(id):
+    blog = yield from Blog.find(id)
+    comments = yield from Comment.findAll('blog_id=?',[id],orderBy='created_at desc')
+    for c in comments:
+        c.html_content = text2html(c.content)
+ #   blog.html_content = markdown2.markdown(blog.content)
+    return{
+        '__template__':'blog.html',
+        'blog':blog,
+        'comments':comments    
     }
 
 '''
@@ -154,3 +186,27 @@ def authenticate(*, email, passwd):
     r.contype_type = 'application/json'
     r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
     return r
+
+@get('/api/blogs/{id}')
+def api_get_blog(*, id):
+    blog = yield from Blog.find(id)
+    return blog
+
+
+# 编写一个REST API，用于创建一个Blog：
+@post('/api/blogs')
+def api_create_blog(request, *, name, summary, content):
+    check_admin(request)
+    if not name or not name.strip():
+        raise APIValueError('name', 'name cannot be empty.')
+    if not summary or not summary.strip():
+        raise APIValueError('summary','summary connot be empty. ')
+    if not content or not content.strip():
+        raise APIValueError('content', 'content connot be empty.')
+    blog = Blog(user_id=request.__user__.id,user_name=request.__user__.name,
+            user_image=request.__user__.image,name=name.strip(), summary=summary.strip(),content=content.strip())
+    
+    logging.info('进入方法。。。')
+    yield from blog.save()
+    return blog
+

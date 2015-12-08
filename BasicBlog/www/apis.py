@@ -11,4 +11,12 @@ class APIValueError(APIError):
     """docstring for APIValue"""
     def __init__(self, field, message=''):
         super(APIValueError, self).__init__('value:invalib',field,message)
-        
+
+
+
+class APIPermissionError(APIError):
+    '''
+    Indicate the api has no permission.
+    '''
+    def __init__(self, message=''):
+        super(APIPermissionError, self).__init__('permission:forbidden', 'permission', message)
