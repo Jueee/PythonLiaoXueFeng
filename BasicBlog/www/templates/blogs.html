@@ -5,6 +5,7 @@
 {% block beforehead %}
 
 <script>
+
 </script>
 
 {% endblock %}
@@ -21,6 +22,7 @@
         </article>
         <hr class="uk-article-divider">
     {% endfor %}
+    <div v-component="pagination" v-with="page"></div>
     </div>
 
     <div class="uk-width-medium-1-4">

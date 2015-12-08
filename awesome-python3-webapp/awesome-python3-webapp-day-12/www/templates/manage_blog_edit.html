@@ -1,31 +1,29 @@
 {% extends '__base__.html' %}
 
-{% block tiele %}编辑日志{% endblock %}
+{% block title %}编辑日志{% endblock %}
 
 {% block beforehead %}
-<script type="text/javascript">
-var 
-    ID = '{{id}}',
-    action = '{{action}}';
-function initVM(blog){
-    /**
-    初始化Vue时，我们指定3个参数：
-    el：根据选择器查找绑定的View，这里是#vm，就是id为vm的DOM，对应的是一个<div>标签；
-    data：JavaScript对象表示的Model，我们初始化为{ name: '', summary: '', content: ''}；
-    methods：View可以触发的JavaScript函数，submit就是提交表单时触发的函数。
-    */
+
+<script>
+
+var
+    ID = '{{ id }}',
+    action = '{{ action }}';
+
+function initVM(blog) {
     var vm = new Vue({
-        el:'#vm',
-        data:blog,
-        methods:{
-            submit: function(event){
+        el: '#vm',
+        data: blog,
+        methods: {
+            submit: function (event) {
                 event.preventDefault();
                 var $form = $('#vm').find('form');
-                $form.postJSON(action, this.$data, function(err,r){
+                $form.postJSON(action, this.$data, function (err, r) {
                     if (err) {
                         $form.showFormError(err);
-                    } else {
-                        return location.assign('/manage/blogs')
+                    }
+                    else {
+                        return location.assign('/manage/blogs');
                     }
                 });
             }
@@ -34,34 +32,34 @@ function initVM(blog){
     $('#vm').show();
 }
 
-$(function(){
-     if('{{__user__}}'=='None'){
-        return location.assign('/')
-     }
+$(function () {
     if (ID) {
-        getJSON('api/blogs/'+ID, function(err, blog){
+        getJSON('/api/blogs/' + ID, function (err, blog) {
             if (err) {
                 return fatal(err);
-            };
+            }
             $('#loading').hide();
             initVM(blog);
         });
-    } else {
+    }
+    else {
         $('#loading').hide();
         initVM({
-            name:'',
-            summary:'',
-            content:''
+            name: '',
+            summary: '',
+            content: ''
         });
     }
 });
+
 </script>
+
 {% endblock %}
 
-
 {% block content %}
-    <div class="uk-margin-bottom uk-width-1-1">
-        <div class="uk-panel uk-panel-box ">
+
+    <div class="uk-width-1-1 uk-margin-bottom">
+        <div class="uk-panel uk-panel-box">
             <ul class="uk-breadcrumb">
                 <li><a href="/manage/comments">评论</a></li>
                 <li><a href="/manage/blogs">日志</a></li>
@@ -78,14 +76,11 @@ $(function(){
     </div>
 
     <div id="vm" class="uk-width-2-3">
-        <!-- Form表单通过<form v-on="submit: submit">把提交表单的事件关联到submit方法 -->
         <form v-on="submit: submit" class="uk-form uk-form-stacked">
             <div class="uk-alert uk-alert-danger uk-hidden"></div>
             <div class="uk-form-row">
                 <label class="uk-form-label">标题:</label>
                 <div class="uk-form-controls">
-                    <!-- 我们在<form>标签中，用几个简单的v-model，就可以让Vue把Model和View关联起来： -->
-                    <!-- input的value和Model的name关联起来了 -->
                     <input v-model="name" name="name" type="text" placeholder="标题" class="uk-width-1-1">
                 </div>
             </div>
@@ -107,6 +102,5 @@ $(function(){
             </div>
         </form>
     </div>
-
 
 {% endblock %}

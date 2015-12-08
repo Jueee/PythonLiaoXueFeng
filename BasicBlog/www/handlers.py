@@ -3,8 +3,9 @@ import re, time, json, logging, hashlib, base64, asyncio
 from coroweb import get, post
 from aiohttp import web
 from models import User, Comment, Blog, next_id
-from apis import APIValueError,APIError,APIPermissionError
+from apis import APIValueError,APIError,APIPermissionError,Page
 from config import configs
+import markdown2
 
 COOKIE_NAME = 'awesession'
 _COOKIE_KEY = configs.session.secret
@@ -14,10 +15,18 @@ _RE_SHA1 = re.compile(r'^[0-9a-f]{40}$')
 
 
 def check_admin(request):
-    logging.info('request.__user__:%s' % (not request.__user__.admin))
     if request.__user__ is None or not request.__user__.admin:
-        logging.info('request.__user__:%s' % request.__user__)
         raise APIPermissionError()
+
+def get_page_index(page_str):
+    p = 1
+    try:
+        p = int(page_str)
+    except ValueError as e:
+        pass
+    if p < 1:
+        p = 1
+    return p
 
 # 计算加密cookie:
 def user2cookie(user, max_age):
@@ -60,16 +69,12 @@ def cookie2user(cookie_str):
 
 @get('/')
 def index(request):
- #   users = yield from User.findAll()
-    summary = 'balabala'
-    blogs = [
-        Blog(id='1',name='Testr Blog',summary=summary,created_at=time.time()-120),
-        Blog(id='2',name='Something New',summary=summary,created_at=time.time()-3600),
-        Blog(id='3',name='Learn Swift',summary=summary,created_at=time.time()-7200)
-    ]
+    num = yield from Blog.findNumber('count(id)')
+    if num == 0:
+        return dict(blogs=())
+    blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(0,9))
     return {
         '__template__':'blogs.html',
-  #      'users':users,
         'blogs':blogs
     }
 
@@ -99,12 +104,20 @@ def get_blog(id):
     comments = yield from Comment.findAll('blog_id=?',[id],orderBy='created_at desc')
     for c in comments:
         c.html_content = text2html(c.content)
- #   blog.html_content = markdown2.markdown(blog.content)
+    blog.html_content = markdown2.markdown(blog.content)
     return{
         '__template__':'blog.html',
         'blog':blog,
         'comments':comments    
     }
+
+@get('/manage/blogs')
+def manage_blogs(*, page='1'):
+    return {
+        '__template__':'manage_blogs.html',
+        'page_index':get_page_index(page)
+    }
+
 
 '''
 @get('/api/users')
@@ -152,7 +165,7 @@ def api_register_user(*, email, name, passwd):
     uid = next_id()
     sha1_passwd  = '%s:%s' % (uid, passwd)
     logging.info("pppp%s" % sha1_passwd)
-    user = User(id=uid,name=name.strip(),email=email,passwd=hashlib.sha1(sha1_passwd.encode('utf-8')).hexdigest(),image='http://www.gravatar.com/avatar/%s?d=mm&s=120' % hashlib.md5(email.encode('utf-8')).hexdigest())
+    user = User(id=uid,name=name.strip(),email=email,passwd=hashlib.sha1(sha1_passwd.encode('utf-8')).hexdigest(),admin=True,image='http://www.gravatar.com/avatar/%s?d=mm&s=120' % hashlib.md5(email.encode('utf-8')).hexdigest())
     yield from user.save()
     # make session cookie:
     r = web.Response()
@@ -210,3 +223,13 @@ def api_create_blog(request, *, name, summary, content):
     yield from blog.save()
     return blog
 
+@get('/api/blogs')
+def api_blogs(*, page='1',request):
+    check_admin(request)
+    page_index = get_page_index(page)
+    num = yield from Blog.findNumber('count(id)')
+    p = Page(num, page_index)
+    if num == 0:
+        return dict(page=p,blogs=())
+    blogs = yield from Blog.findAll('user_id=?', [request.__user__.id],orderBy='created_at desc', limit=(p.offset,p.limit))
+    return dict(page=p, blogs=blogs)
