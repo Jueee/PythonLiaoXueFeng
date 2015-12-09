@@ -62,11 +62,15 @@ def auth_factory(app, handler):
         logging.info('check user: %s %s' % (request.method, request.path))
         request.__user__ = None
         cookie_str = request.cookies.get(COOKIE_NAME)
+        # 把当前用户绑定到request上
         if cookie_str:
             user = yield from cookie2user(cookie_str)
             if user:
                 logging.info('set current user:%s' % user.email)
                 request.__user__ = user
+        # 对URL/manage/进行拦截，检查当前用户是否是管理员身份
+#        if request.path.startswith('/manage') and (request.__user__ is None or not request.__user__.admin):
+#           return web.HTTPFound('/signin')
         return (yield from handler(request))
     return auth
 
@@ -135,7 +139,7 @@ def init(loop):
     init_jinja2(app,filters=dict(datetime=datetime_filter))
     add_routes(app, 'handlers')
     add_static(app)
-    srv = yield from loop.create_server(app.make_handler(),'127.0.0.1',9000)
+    srv = yield from loop.create_server(app.make_handler(),'192.168.244.90',80)
     logging.info('server started at http://127.0.0.1:9000...')
     return srv
 

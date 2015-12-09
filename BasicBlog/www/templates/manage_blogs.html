@@ -31,9 +31,6 @@ function initVM(data){
 }
 
 $(function(){
-    if('{{__user__}}'=='None'){
-       return location.assign('/')
-    }
     getJSON('/api/blogs',{
         page:{{page_index}}
     }, function (err,results){
@@ -51,15 +48,18 @@ $(function(){
 
 {% block content %}
     <div id="vm" class="uk-width-1-1">
+        {% if __user__ %}
         <a href="/manage/blogs/create" class="uk-button uk-button-primary"><i class="uk-icon-plus"></i> 新日志</a>
-
+        {% endif %}
         <table class="uk-table uk-table-hover">
             <thead>
                 <tr>
                     <th class="uk-width-5-10">标题 / 摘要</th>
                     <th class="uk-width-2-10">作者</th>
                     <th class="uk-width-2-10">创建时间</th>
+                    {% if __user__ %}
                     <th class="uk-width-1-10">操作</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -74,10 +74,12 @@ $(function(){
                     <td>
                         <span v-text="blog.created_at.toDateTime()"></span>
                     </td>
+                    {% if __user__ %}
                     <td>
                         <a href="#0" v-on="click: edit_blog(blog)"><i class="uk-icon-edit"></i>
                         <a href="#0" v-on="click: delete_blog(blog)"><i class="uk-icon-trash-o"></i>
                     </td>
+                    {% endif %}
                 </tr>
             </tbody>
         </table>
