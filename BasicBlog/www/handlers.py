@@ -91,11 +91,19 @@ def signin(request):
     }
 
 @get('/manage/blogs/create')
-def manage_blog_edit(request):
+def manage_create_blog():
     return {
         '__template__':'manage_blog_edit.html',
         'id':'',
         'action':'/api/blogs'
+    }
+
+@get('/manage/blogs/edit')
+def manage_edit_blog(*,id):
+    return {
+        '__template__':'manage_blog_edit.html',
+        'id':id,
+        'action':'/api/blogs/%s' % id
     }
 
 @get('/blog/{id}')
@@ -104,7 +112,7 @@ def get_blog(id):
     comments = yield from Comment.findAll('blog_id=?',[id],orderBy='created_at desc')
     for c in comments:
         c.html_content = text2html(c.content)
-    blog.html_content = markdown2.markdown(blog.content)
+    blog.html_content = markdown2.markdown(text2html(blog.content))
     return{
         '__template__':'blog.html',
         'blog':blog,
@@ -235,3 +243,28 @@ def api_blogs(*, page='1',request):
     else:
         blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(p.offset,p.limit))
     return dict(page=p, blogs=blogs)
+
+# 修改日志
+@post('/api/blogs/{id}')
+def api_update_blog(id, request, *, name, summary, content):
+    check_admin(request)
+    if not name or not name.strip():
+        raise APIValueError('name', 'name cannot be empty.')
+    if not summary or not summary.strip():
+        raise APIValueError('summary','summary connot be empty. ')
+    if not content or not content.strip():
+        raise APIValueError('content', 'content connot be empty.')
+    blog = yield from Blog.find(id)
+    blog.name = name.strip()
+    blog.summary = summary.strip()
+    blog.content = content.strip()
+    yield from blog.update()
+    return blog
+
+# 删除日志
+@post('/api/blogs/{id}/delete')
+def api_delete_blog(request, *, id):
+    check_admin(request)
+    blog = yield from Blog.find(id)
+    yield from blog.remove()
+    return dict(id=id)

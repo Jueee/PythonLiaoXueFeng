@@ -1,1 +1,5 @@
-print(str("恒生综合运营管理平台".encode('unicode-escape')))
+import socket
+
+myname = socket.getfqdn(socket.gethostname())
+myaddr = socket.gethostbyname(myname)
+print(myaddr,myname)

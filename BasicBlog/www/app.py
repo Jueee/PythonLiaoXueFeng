@@ -2,7 +2,7 @@
 # 20151130-02
 # 由于我们的Web App建立在asyncio的基础上，因此用aiohttp写一个基本的app.py：
 import logging; logging.basicConfig(level=logging.INFO)
-
+import socket
 import asyncio, os, json, time
 from datetime import datetime
 
@@ -139,8 +139,12 @@ def init(loop):
     init_jinja2(app,filters=dict(datetime=datetime_filter))
     add_routes(app, 'handlers')
     add_static(app)
-    srv = yield from loop.create_server(app.make_handler(),'192.168.244.90',80)
-    logging.info('server started at http://127.0.0.1:9000...')
+    # 获取本机机器名
+    myname = socket.getfqdn(socket.gethostname())
+    # 获取本机 IP 地址
+    myaddr = socket.gethostbyname(myname)
+    srv = yield from loop.create_server(app.make_handler(),myaddr,80)
+    logging.info('server started at http://%s:9000...' % myaddr)
     return srv
 
 loop = asyncio.get_event_loop()

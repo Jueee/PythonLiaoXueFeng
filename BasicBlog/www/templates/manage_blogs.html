@@ -15,13 +15,13 @@ function initVM(data){
             edit_blog:function(blog){
                 location.assign('/manage/blogs/edit?id='+blog.id);
             },
-            dalete_blog:function(blog){
+            delete_blog:function(blog){
                 if (confirm('确认要删除“'+blog.name+"”？删除后不可恢复！")) {
                     postJSON('/api/blogs/'+blog.id+'/delete',function(err,r){
                         if (err) {
                             return alert(err.message||err.error||err);
                         };
-                        refersh();
+                        refresh();
                     });
                 };
             }
@@ -50,6 +50,8 @@ $(function(){
     <div id="vm" class="uk-width-1-1">
         {% if __user__ %}
         <a href="/manage/blogs/create" class="uk-button uk-button-primary"><i class="uk-icon-plus"></i> 新日志</a>
+        {% else %}
+        <a href="/signin" class="uk-button uk-button-primary"><i class="uk-icon-plus"></i> 新建请登录</a>
         {% endif %}
         <table class="uk-table uk-table-hover">
             <thead>
