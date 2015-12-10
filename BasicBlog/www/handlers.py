@@ -71,8 +71,9 @@ def cookie2user(cookie_str):
 def index(request):
     num = yield from Blog.findNumber('count(id)')
     if num == 0:
-        return dict(blogs=())
-    blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(0,9))
+        blogs=()
+    else:
+        blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(0,9))
     return {
         '__template__':'blogs.html',
         'blogs':blogs

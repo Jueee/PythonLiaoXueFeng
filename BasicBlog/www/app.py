@@ -140,10 +140,11 @@ def init(loop):
     add_routes(app, 'handlers')
     add_static(app)
     # 获取本机机器名
-    myname = socket.getfqdn(socket.gethostname())
+    myname = socket.gethostname()
     # 获取本机 IP 地址
-    myaddr = socket.gethostbyname(myname)
-    srv = yield from loop.create_server(app.make_handler(),myaddr,80)
+    # myaddr = socket.gethostbyname(myname)
+    myaddr = socket.gethostbyname(socket.gethostname())
+    srv = yield from loop.create_server(app.make_handler(),myaddr,9000)
     logging.info('server started at http://%s:9000...' % myaddr)
     return srv
 
