@@ -144,7 +144,7 @@ def init(loop):
     # 获取本机 IP 地址
     # myaddr = socket.gethostbyname(myname)
     myaddr = socket.gethostbyname(socket.gethostname())
-    srv = yield from loop.create_server(app.make_handler(),myaddr,9000)
+    srv = yield from loop.create_server(app.make_handler(),myaddr,80)
     logging.info('server started at http://%s:9000...' % myaddr)
     return srv
 
