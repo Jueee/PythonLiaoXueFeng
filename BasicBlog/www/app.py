@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 # 20151130-02
 # 由于我们的Web App建立在asyncio的基础上，因此用aiohttp写一个基本的app.py：
@@ -144,8 +146,8 @@ def init(loop):
     # 获取本机 IP 地址
     # myaddr = socket.gethostbyname(myname)
     myaddr = socket.gethostbyname(socket.gethostname())
-    srv = yield from loop.create_server(app.make_handler(),myaddr,9000)
-    logging.info('server started at http://%s:9000...' % myaddr)
+    srv = yield from loop.create_server(app.make_handler(),'127.0.0.1',9000)
+    logging.info('server started at http://%s:9000...' % '127.0.0.1')
     return srv
 
 loop = asyncio.get_event_loop()

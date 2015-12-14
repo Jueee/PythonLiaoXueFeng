@@ -1,0 +1,3 @@
+2015/12/14 08:05:10 [error] 24166#0: *60 connect() failed (111: Connection refused) while connecting to upstream, client: 104.238.151.238, server: www.jueee.site, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:9000/", host: "www.jueee.site"
+2015/12/14 08:05:55 [error] 24166#0: *62 connect() failed (111: Connection refused) while connecting to upstream, client: 104.238.151.238, server: www.jueee.site, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:9000/", host: "www.jueee.site"
+2015/12/14 08:10:09 [error] 24190#0: *64 connect() failed (111: Connection refused) while connecting to upstream, client: 104.238.151.238, server: www.jueee.site, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:9000/", host: "www.jueee.site"
