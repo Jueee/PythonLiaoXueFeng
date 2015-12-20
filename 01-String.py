@@ -11,6 +11,7 @@ print(chr(21334))
 print('\u4e2d\u6587')
 
 
+
 # 纯英文的str可以用ASCII编码为bytes，内容是一样的
 print('ABC'.encode('ascii'))
 # 含有中文的str可以用UTF-8编码为bytes。
