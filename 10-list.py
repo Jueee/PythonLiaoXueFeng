@@ -1,6 +1,7 @@
 '''
 列表生成式
 
+
 列表生成式即List Comprehensions，是Python内置的非常简单却强大的可以用来创建list的生成式。
 '''
 print(list(range(1,11)))
