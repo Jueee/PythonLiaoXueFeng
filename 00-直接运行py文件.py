@@ -7,6 +7,7 @@
 print('hello, world')
 
 
+
 然后，通过命令给hello.py以执行权限：
 
 $ chmod a+x hello.py
