@@ -3,7 +3,7 @@ import re, time, json, logging, hashlib, base64, asyncio
 from coroweb import get, post
 from aiohttp import web
 from models import User, Comment, Blog, next_id
-from apis import APIValueError,APIError,APIPermissionError,Page
+from apis import APIValueError,APIError,APIPermissionError,Page,APIResourceNotFoundError
 from config import configs
 import markdown2
 
@@ -68,14 +68,16 @@ def cookie2user(cookie_str):
         return None
 
 @get('/')
-def index(request):
+def index(*,page='1'):
     num = yield from Blog.findNumber('count(id)')
+    page = Page(num)
     if num == 0:
-        blogs=()
+        blogs=[]
     else:
-        blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(0,9))
+        blogs = yield from Blog.findAll(orderBy='created_at desc', limit=(page.offset, page.limit))
     return {
         '__template__':'blogs.html',
+        'page':page,
         'blogs':blogs
     }
 
@@ -268,4 +270,38 @@ def api_delete_blog(request, *, id):
     check_admin(request)
     blog = yield from Blog.find(id)
     yield from blog.remove()
+    return dict(id=id)
+
+@post('/api/blogs/{id}/comments')
+def api_create_comment(id, request, *, content):
+    user = request.__user__
+    if user is None:
+        raise APIPermissionError('Please signin first.')
+    if not content or not content.strip():
+        raise APIValueError('content')
+    blog = yield from Blog.find(id)
+    if blog is None:
+        raise APIResourceNotFoundError('Blog')
+    comment = Comment(blog_id=blog.id, user_id=user.id, user_name=user.name, user_image=user.image, content=content.strip())
+    yield from comment.save()
+    return comment
+
+@get('/api/comments')
+def api_comments(*, page='1'):
+    page_index = get_page_index(page)
+    num = yield from Comment.findNumber('count(id)')
+    p = Page(num, page_index)
+    if num == 0:
+        return dict(page=p, comments=())
+    comments = yield from Comment.findAll(orderBy='created_at desc', limit=(p.offset,p.limit))
+    return dict(page=p, comments=comments)
+
+
+@post('/api/comments/{id}/delete')
+def api_delete_comments(id, request):
+    check_admin(request)
+    c = yield from Comment.find(id)
+    if c is None:
+        raise APIResourceNotFoundError('Comment')
+    yield from c.remove()
     return dict(id=id)

@@ -12,7 +12,11 @@ class APIValueError(APIError):
     def __init__(self, field, message=''):
         super(APIValueError, self).__init__('value:invalib (值：无效)',field,message)
 
-
+class APIResourceNotFoundError(APIError):
+    """docstring for APIResourceNotFoundError"""
+    def __init__(self, field, message=''):
+        super(APIResourceNotFoundError, self).__init__('value:notfound', field, message)
+        
 
 class APIPermissionError(APIError):
     '''
