@@ -6,7 +6,7 @@ Python内置了字典：dict的支持，dict全称dictionary，在其他语言�
 d = {'Min':95, 'Bob':75, 'Tra':85}
 print(d, type(d))
 print(d['Min'])
-
+print(d)
 # 如果key不存在，dict就会报错
 
 # 要避免key不存在的错误，有两种办法，一是通过in判断key是否存在
